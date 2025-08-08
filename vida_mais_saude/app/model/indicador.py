@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 from datetime import datetime
 
 from sqlalchemy import String, ForeignKey, func
@@ -11,8 +12,11 @@ from sqlalchemy.orm import (
 
 from app.model._base import ModelBase
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Cliente
+
+# As funções mapped_column e relationship retornam um decriptor, que já 
+# implementa, por padrão, getters e setters para os atributos da classe
 class Indicador(ModelBase):
     """
     Classe de mapeamento da entitade 'indicador' do banco de dados
@@ -48,7 +52,11 @@ class Indicador(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    cliente: Mapped[Cliente] = relationship(
+        back_populates='indicadores',
+        init=False,
+        repr=False,
+    )
 
     # Validações
     @validates('id_indicador', 'id_cliente')

@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.orm import (
     Mapped,
@@ -8,8 +11,11 @@ from sqlalchemy.orm import (
 
 from app.model._base import ModelBase
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Profissional
+
+# As funções mapped_column e relationship retornam um decriptor, que já 
+# implementa, por padrão, getters e setters para os atributos da classe
 class Especialidade(ModelBase):
     """
     Classe de mapeamento da entitade 'especialidade' do banco de dados
@@ -28,7 +34,11 @@ class Especialidade(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    profissionais: Mapped[list[Profissional]] = relationship(
+        back_populates='especialidade',
+        init=False,
+        repr=False,
+    )
 
     # Validações
     @validates('id_especialidade')

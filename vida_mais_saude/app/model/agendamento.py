@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from datetime import date
 
 from sqlalchemy import ForeignKey
@@ -10,8 +12,11 @@ from sqlalchemy.orm import (
 
 from app.model._base import ModelBase
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Profissional, Cliente, Dia, Hora
+
+# As funções mapped_column e relationship retornam um decriptor, que já
+# implementa, por padrão, getters e setters para os atributos da classe
 class Agendamento(ModelBase):
     """
     Classe de mapeamento da entitade 'agendamento' do banco de dados
@@ -45,7 +50,26 @@ class Agendamento(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    profissional: Mapped[Profissional] = relationship(
+        back_populates='agendamentos',
+        init=False,
+        repr=False,
+    )
+    cliente: Mapped[Cliente] = relationship(
+        back_populates='agendamentos',
+        init=False,
+        repr=False,
+    )
+    dia: Mapped[Dia] = relationship(
+        back_populates='agendamentos',
+        init=False,
+        repr=False,
+    )
+    hora: Mapped[Hora] = relationship(
+        back_populates='agendamentos',
+        init=False,
+        repr=False,
+    )
 
     # Validações
     @validates(

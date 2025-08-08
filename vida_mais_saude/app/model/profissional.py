@@ -1,4 +1,5 @@
-from typing import Optional
+from __future__ import annotations
+from typing import Optional, TYPE_CHECKING
 
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import (
@@ -9,9 +10,16 @@ from sqlalchemy.orm import (
 )
 
 from app.model._base import ModelBase
+from app.model._associacoes import (
+    dia_disponivel_m2m,
+    horario_disponivel_m2m
+)
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Especialidade, Agendamento, Dia, Hora
+
+# As funções mapped_column e relationship retornam um decriptor, que já
+# implementa, por padrão, getters e setters para os atributos da classe
 class Profissional(ModelBase):
     """
     Classe de mapeamento da entitade 'profissional' do banco de dados
@@ -48,7 +56,28 @@ class Profissional(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    especialidade: Mapped[Especialidade] = relationship(
+        back_populates='profissionais',
+        init=False,
+        repr=False,
+    )
+    agendamentos: Mapped[list[Agendamento]] = relationship(
+        back_populates='profissional',
+        init=False,
+        repr=False,
+    )
+    dias: Mapped[list[Dia]] = relationship(
+        secondary=dia_disponivel_m2m,
+        back_populates='profissionais',
+        init=False,
+        repr=False,
+    )
+    horarios: Mapped[list[Hora]] = relationship(
+        secondary=horario_disponivel_m2m,
+        back_populates='profissionais',
+        init=False,
+        repr=False,
+    )
 
     # Validações
     @validates('id_profissional', 'id_especialidade')

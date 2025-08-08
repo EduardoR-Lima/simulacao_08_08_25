@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from datetime import time
 
 from sqlalchemy.orm import (
@@ -8,9 +10,13 @@ from sqlalchemy.orm import (
 )
 
 from app.model._base import ModelBase
+from app.model._associacoes import horario_disponivel_m2m
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Profissional, Agendamento
+
+# As funções mapped_column e relationship retornam um decriptor, que já 
+# implementa, por padrão, getters e setters para os atributos da classe
 class Hora(ModelBase):
     """
     Classe de mapeamento da entitade 'hora' do banco de dados
@@ -26,7 +32,17 @@ class Hora(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    profissionais: Mapped[list[Profissional]] = relationship(
+        secondary=horario_disponivel_m2m,
+        back_populates='horarios',
+        init=False,
+        repr=False,
+    )
+    agendamentos: Mapped[list[Agendamento]] = relationship(
+        back_populates='hora',
+        init=False,
+        repr=False,
+    )
 
     # Validações
     @validates('id_hora')

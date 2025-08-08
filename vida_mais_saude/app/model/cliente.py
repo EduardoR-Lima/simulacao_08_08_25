@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from sqlalchemy import String
@@ -10,8 +13,11 @@ from sqlalchemy.orm import (
 
 from app.model._base import ModelBase
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Agendamento, Indicador
+
+# As funções mapped_column e relationship retornam um decriptor, que já 
+# implementa, por padrão, getters e setters para os atributos da classe
 class Cliente(ModelBase):
     """
     Classe de mapeamento da entitade 'cliente' do banco de dados
@@ -61,7 +67,16 @@ class Cliente(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    agendamentos: Mapped[list[Agendamento]] = relationship(
+        back_populates='cliente',
+        init=False,
+        repr=False,
+    )
+    indicadores: Mapped[list[Indicador]] = relationship(
+        back_populates='cliente',
+        init=False,
+        repr=False,
+    )
 
     def atribuir_senha(self, senha: str):
         """

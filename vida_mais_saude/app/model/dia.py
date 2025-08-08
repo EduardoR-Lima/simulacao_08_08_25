@@ -1,3 +1,6 @@
+from __future__ import annotations
+from typing import TYPE_CHECKING
+
 from sqlalchemy import String
 from sqlalchemy.orm import (
     Mapped,
@@ -7,9 +10,13 @@ from sqlalchemy.orm import (
 )
 
 from app.model._base import ModelBase
+from app.model._associacoes import dia_disponivel_m2m
 
-# A função mapped_column retorna um decriptor, que já implementa, por
-# padrão, getters e setters para os atributos da classe
+if TYPE_CHECKING:
+    from app.model import Profissional, Agendamento
+
+# As funções mapped_column e relationship retornam um decriptor, que já
+# implementa, por padrão, getters e setters para os atributos da classe
 class Dia(ModelBase):
     """
     Classe de mapeamento da entitade 'dia' do banco de dados
@@ -26,7 +33,17 @@ class Dia(ModelBase):
     )
 
     # Atributos de relacionamento
-    # pendente
+    profissionais: Mapped[list[Profissional]] = relationship(
+        secondary=dia_disponivel_m2m,
+        back_populates='dias',
+        init=False,
+        repr=False,
+    )
+    agendamentos: Mapped[list[Agendamento]] = relationship(
+        back_populates='dia',
+        init=False,
+        repr=False,
+    )
 
     # Validações
     @validates('id_dia')
