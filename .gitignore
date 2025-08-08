@@ -1,0 +1,11 @@
+# python bytecode
+__pycache__/
+
+# sensitive data
+.env
+
+# backup file
+*.bak
+
+# bat scripts
+*.bat
